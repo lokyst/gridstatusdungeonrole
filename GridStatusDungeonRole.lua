@@ -13,15 +13,15 @@ GridStatusDungeonRole.menuName = L["Dungeon Role"]
 local rolestatus = {
     healer = {
 		text = L["Healer"],
-		icon = "Interface\\Icons\\Spell_Holy_Renew",
+		icon = [[Interface\AddOns\GridStatusDungeonRole\icons\healer.tga]],
 	},
     DPS = {
 		text = L["DPS"],
-		icon = "Interface\\Icons\\Ability_DualWield",
+		icon = [[Interface\AddOns\GridStatusDungeonRole\icons\damager.tga]],
 	},
     tank = {
 		text = L["Tank"],
-		icon = "Interface\\Icons\\Ability_Warrior_ShieldMastery",
+		icon = [[Interface\AddOns\GridStatusDungeonRole\icons\tank.tga]],
 	},
 }
 
