@@ -5,6 +5,8 @@ local L = AceLibrary("AceLocale-2.2"):new("GridStatusDungeonRole")
 
 -- Grid Initialization
 local GridStatus = Grid:GetModule("GridStatus")
+local GridRoster = Grid:GetModule("GridRoster")
+
 local GridStatusDungeonRole = GridStatus:NewModule("DungeonRole")
 GridStatusDungeonRole.menuName = L["Dungeon Role"]
 
