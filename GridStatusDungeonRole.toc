@@ -1,0 +1,13 @@
+## Interface: 30300
+## Title: GridStatusDungeonRole
+## Notes: Adds dungeon finder role status to Grid.
+## Author: lokyst
+## Version: 0.1
+## Grid Author: Pastamancer & Maia
+## X-Website: http://wowace.com/wiki/Grid
+## X-Category: UnitFrame
+## X-GridStatusModule: GridStatusDungeonRole
+## Dependencies: Grid
+
+GridStatusDungeonRoleLocale-enUS.lua
+GridStatusDungeonRole.lua
