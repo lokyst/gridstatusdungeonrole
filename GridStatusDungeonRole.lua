@@ -1,11 +1,9 @@
--- GridStatusDungeonRole.lua
---
--- Created By : lokyst
-
---{{{ Libraries
+-- Libraries
 local L = AceLibrary("AceLocale-2.2"):new("GridStatusDungeonRole")
---}}}
 
+
+
+-- Grid Initialization
 local GridStatus = Grid:GetModule("GridStatus")
 local GridStatusDungeonRole = GridStatus:NewModule("DungeonRole")
 GridStatusDungeonRole.menuName = L["Dungeon Role"]
@@ -25,7 +23,9 @@ local rolestatus = {
 	},
 }
 
---{{{ AceDB defaults
+
+
+-- Grid config defaults
 GridStatusDungeonRole.defaultDB = {
     debug = false,
     dungeonRole = {
@@ -47,7 +47,6 @@ GridStatusDungeonRole.defaultDB = {
         },
     },
 }
---}}}
 
 GridStatusDungeonRole.options = false
 
@@ -74,7 +73,9 @@ local function setrolefilter(role, v)
     GridStatusDungeonRole:RoleCheckAll()
 end
 
---{{{ additional options
+
+
+-- Grid configration options
 local roleOptions = {
     ["healer"] = {
         type = "color",
@@ -156,8 +157,10 @@ local roleOptions = {
     
     ["color"] = false,
 }
---}}}
 
+
+
+-- Status handling
 function GridStatusDungeonRole:OnInitialize()
     self.super.OnInitialize(self)
     self:RegisterStatus("dungeonRole", L["Dungeon Role"], roleOptions, true)
@@ -213,6 +216,9 @@ function GridStatusDungeonRole:Grid_LeavingCombat()
     end
 end
 
+
+
+-- Role check functions
 function GridStatusDungeonRole:RoleCheckAll()
     local settings = self.db.profile.dungeonRole
     if settings.enable and ( not settings.hideInCombat or not Grid.inCombat ) then
