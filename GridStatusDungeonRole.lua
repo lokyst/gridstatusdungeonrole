@@ -12,17 +12,17 @@ GridStatusDungeonRole.menuName = L["Dungeon Role"]
 
 local rolestatus = {
     healer = {
-		text = L["Healer"],
-		icon = [[Interface\AddOns\GridStatusDungeonRole\icons\healer.tga]],
-	},
+                text = L["Healer"],
+                icon = [[Interface\AddOns\GridStatusDungeonRole\icons\healer.tga]],
+        },
     DPS = {
-		text = L["DPS"],
-		icon = [[Interface\AddOns\GridStatusDungeonRole\icons\damager.tga]],
-	},
+                text = L["DPS"],
+                icon = [[Interface\AddOns\GridStatusDungeonRole\icons\damager.tga]],
+        },
     tank = {
-		text = L["Tank"],
-		icon = [[Interface\AddOns\GridStatusDungeonRole\icons\tank.tga]],
-	},
+                text = L["Tank"],
+                icon = [[Interface\AddOns\GridStatusDungeonRole\icons\tank.tga]],
+        },
 }
 
 
@@ -156,7 +156,7 @@ local roleOptions = {
             end
         end,
     },
-    
+
     ["color"] = false,
 }
 
@@ -170,25 +170,25 @@ end
 
 function GridStatusDungeonRole:OnStatusEnable(status)
     if status == "dungeonRole" then
-	if self.db.profile.dungeonRole.hideInCombat then
-	    self:RegisterEvent("Grid_EnteringCombat")
-	    self:RegisterEvent("Grid_LeavingCombat")
-	end
-	self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "RoleCheckAll")
-	self:RegisterEvent("PARTY_MEMBERS_CHANGED", "RoleCheckAll")
-	self:RoleCheckAll()
+        if self.db.profile.dungeonRole.hideInCombat then
+            self:RegisterEvent("Grid_EnteringCombat")
+            self:RegisterEvent("Grid_LeavingCombat")
+        end
+        self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "RoleCheckAll")
+        self:RegisterEvent("PARTY_MEMBERS_CHANGED", "RoleCheckAll")
+        self:RoleCheckAll()
     end
 end
 
 function GridStatusDungeonRole:OnStatusDisable(status)
     if status == "dungeonRole" then
-	if self.db.profile.dungeonRole.hideInCombat then
-	    self:UnregisterEvent("Grid_EnteringCombat")
-	    self:UnregisterEvent("Grid_LeavingCombat")
-	end
-	self.UnregisterEvent("PLAYER_ROLES_ASSIGNED")
-	self.UnregisterEvent("PARTY_MEMBERS_CHANGED")
-	self.core:SendStatusLostAllUnits("dungeonRole")
+        if self.db.profile.dungeonRole.hideInCombat then
+            self:UnregisterEvent("Grid_EnteringCombat")
+            self:UnregisterEvent("Grid_LeavingCombat")
+        end
+        self:UnregisterEvent("PLAYER_ROLES_ASSIGNED")
+        self:UnregisterEvent("PARTY_MEMBERS_CHANGED")
+        self.core:SendStatusLostAllUnits("dungeonRole")
     end
 end
 
@@ -228,7 +228,7 @@ function GridStatusDungeonRole:RoleCheckAll()
             self:RoleCheck(guid)
         end
     else
-	self.core:SendStatusLostAllUnits("dungeonRole")
+        self.core:SendStatusLostAllUnits("dungeonRole")
     end
 end
 
@@ -236,32 +236,34 @@ function GridStatusDungeonRole:RoleCheck(guid)
     local gained
     local settings = self.db.profile.dungeonRole
     if settings.enable and ( not settings.hideInCombat or not Grid.inCombat ) then
-	local isTank, isHeal, isDPS = UnitGroupRolesAssigned(GridRoster:GetUnitidByGUID(guid))
-	if isTank then
-	    role = "tank"
-	elseif isHeal then
-	    role = "healer"
-	elseif isDPS then
-	    role = "DPS"
-	else
-	    role = false
-	    gained = false
-	end
+        local isTank, isHeal, isDPS = UnitGroupRolesAssigned(GridRoster:GetUnitidByGUID(guid))
+        if isTank then
+            role = "tank"
+        elseif isHeal then
+            role = "healer"
+        elseif isDPS then
+            role = "DPS"
+        else
+            role = false
+            gained = false
+        end
         if role and settings.filter[role] then
             local status = rolestatus[role]
-            self.core:SendStatusGained(guid,
-                                        "dungeonRole",
-                                        settings.priority,
-                                        (settings.range and 40),
-                                        settings.colors[role],
-                                        status.text,
-                                        nil,
-                                        nil,
-                                        status.icon)
+            self.core:SendStatusGained(
+                guid,
+                "dungeonRole",
+                settings.priority,
+                (settings.range and 40),
+                settings.colors[role],
+                status.text,
+                nil,
+                nil,
+                status.icon
+            )
             gained = true
         end
     end
     if not gained then
-	self.core:SendStatusLost(guid, "dungeonRole")
+        self.core:SendStatusLost(guid, "dungeonRole")
     end
 end
