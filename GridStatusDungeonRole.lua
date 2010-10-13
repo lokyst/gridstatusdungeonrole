@@ -1,7 +1,5 @@
 -- Libraries
-local L = AceLibrary("AceLocale-2.2"):new("GridStatusDungeonRole")
-
-
+local L = LibStub("AceLocale-3.0"):GetLocale("GridStatusDungeonRole", true)
 
 -- Grid Initialization
 local GridStatus = Grid:GetModule("GridStatus")

@@ -9,5 +9,8 @@
 ## X-GridStatusModule: GridStatusDungeonRole
 ## Dependencies: Grid
 
-GridStatusDungeonRoleLocale-enUS.lua
+embeds.xml
+
+localization\enUS.lua
+
 GridStatusDungeonRole.lua
