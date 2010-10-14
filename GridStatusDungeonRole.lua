@@ -2,22 +2,21 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("GridStatusDungeonRole", true)
 
 -- Grid Initialization
-local GridStatus = Grid:GetModule("GridStatus")
 local GridRoster = Grid:GetModule("GridRoster")
 
-local GridStatusDungeonRole = GridStatus:NewModule("DungeonRole")
+local GridStatusDungeonRole = Grid:GetModule("GridStatus"):NewModule("DungeonRole")
 GridStatusDungeonRole.menuName = L["Dungeon Role"]
 
 local rolestatus = {
-    healer = {
+    HEALER = {
                 text = L["Healer"],
                 icon = [[Interface\AddOns\GridStatusDungeonRole\icons\healer.tga]],
         },
-    DPS = {
+    DAMAGER = {
                 text = L["DPS"],
                 icon = [[Interface\AddOns\GridStatusDungeonRole\icons\damager.tga]],
         },
-    tank = {
+    TANK = {
                 text = L["Tank"],
                 icon = [[Interface\AddOns\GridStatusDungeonRole\icons\tank.tga]],
         },
@@ -36,73 +35,90 @@ GridStatusDungeonRole.defaultDB = {
         range = false,
         hideInCombat = false,
         colors = {
-            DPS = { r = 0.75, g = 0, b = 0, a = 1 },
-            healer = { r = 0, g = 0.75, b = 0, a = 1 },
-            tank = { r = 0, g = 0, b = 0.75, a = 1 },
+            DAMAGER = { r = 0.75, g = 0, b = 0, a = 1 },
+            HEALER = { r = 0, g = 0.75, b = 0, a = 1 },
+            TANK = { r = 0, g = 0, b = 0.75, a = 1 },
         },
         filter = {
-            DPS = true,
-            healer = true,
-            tank = true,
+            DAMAGER = true,
+            HEALER = true,
+            TANK = true,
         },
     },
 }
 
 GridStatusDungeonRole.options = false
 
-local function getrolecolor(role)
+local function GetRoleColor(role)
     local color = GridStatusDungeonRole.db.profile.dungeonRole.colors[role]
     return color.r, color.g, color.b, color.a
 end
 
-local function setrolecolor(role, r, g, b, a)
+local function SetRoleColor(role, r, g, b, a)
     local color = GridStatusDungeonRole.db.profile.dungeonRole.colors[role]
     color.r = r
     color.g = g
     color.b = b
     color.a = a or 1
-    GridStatus:TriggerEvent("Grid_ColorsChanged")
+    GridStatusDungeonRole:SendMessage("Grid_ColorsChanged")
 end
 
-local function getrolefilter(role)
-    return GridStatusDungeonRole.db.profile.dungeonRole.filter[role] ~= false
+local function GetRoleFilter(role)
+    return GridStatusDungeonRole.db.profile.dungeonRole.filter[role]
 end
 
-local function setrolefilter(role, v)
+local function SetRoleFilter(role, v)
     GridStatusDungeonRole.db.profile.dungeonRole.filter[role] = v
     GridStatusDungeonRole:RoleCheckAll()
 end
 
+local function GetHideInCombat()
+    return GridStatusDungeonRole.db.profile.dungeonRole.hideInCombat
+end
 
+local function SetHideInCombat(v)
+    local settings = GridStatusDungeonRole.db.profile.dungeonRole
+    settings.hideInCombat = v
+    if settings.enable then
+        if settings.hideInCombat then
+            GridStatusDungeonRole:RegisterMessage("Grid_EnteringCombat")
+            GridStatusDungeonRole:RegisterMessage("Grid_LeavingCombat")
+        else
+            GridStatusDungeonRole:UnregisterMessage("Grid_EnteringCombat")
+            GridStatusDungeonRole:UnregisterMessage("Grid_LeavingCombat")
+        end
+        GridStatusDungeonRole:RoleCheckAll()
+    end
+end
 
 -- Grid configration options
 local roleOptions = {
-    ["healer"] = {
+    ["HEALER"] = {
         type = "color",
         name = L["Healer color"],
         desc = L["Color for Healers."],
         order = 87,
         hasAlpha = true,
-        get = function () return getrolecolor("healer") end,
-        set = function (r, g, b, a) setrolecolor("healer", r, g, b, a) end,
+        get = function () return GetRoleColor("HEALER") end,
+        set = function (_, r, g, b, a) SetRoleColor("HEALER", r, g, b, a) end,
     },
-    ["DPS"] = {
+    ["DAMAGER"] = {
         type = "color",
         name = L["DPS color"],
         desc = L["Color for DPS."],
         order = 88,
         hasAlpha = true,
-        get = function () return getrolecolor("DPS") end,
-        set = function (r, g, b, a) setrolecolor("DPS", r, g, b, a) end,
+        get = function () return GetRoleColor("DAMAGER") end,
+        set = function (_, r, g, b, a) SetRoleColor("DAMAGER", r, g, b, a) end,
     },
-    ["tank"] = {
+    ["TANK"] = {
         type = "color",
         name = L["Tank color"],
         desc = L["Color for Tanks."],
         order = 89,
         hasAlpha = true,
-        get = function () return getrolecolor("tank") end,
-        set = function (r, g, b, a) setrolecolor("tank", r, g, b, a) end,
+        get = function () return GetRoleColor("TANK") end,
+        set = function (_, r, g, b, a) SetRoleColor("TANK", r, g, b, a) end,
     },
     ["filter"] = {
         type = "group",
@@ -110,26 +126,26 @@ local roleOptions = {
         desc = L["Show status for the selected roles."],
         order = 90,
         args = {
-            ["healer"] = {
+            ["HEALER"] = {
                 type = "toggle",
                 name = L["Healer"],
                 desc = L["Show on Healer."],
-                get = function () return getrolefilter("healer") end,
-                set = function (v) setrolefilter("healer", v) end,
+                get = function () return GetRoleFilter("HEALER") end,
+                set = function (_, v) SetRoleFilter("HEALER", v) end,
             },
-            ["DPS"] = {
+            ["DAMAGER"] = {
                 type = "toggle",
                 name = L["DPS"],
                 desc = L["Show on DPS."],
-                get = function () return getrolefilter("DPS") end,
-                set = function (v) setrolefilter("DPS", v) end,
+                get = function () return GetRoleFilter("DAMAGER") end,
+                set = function (_, v) SetRoleFilter("DAMAGER", v) end,
             },
-            ["tank"] = {
+            ["TANK"] = {
                 type = "toggle",
                 name = L["Tank"],
                 desc = L["Show on Tank."],
-                get = function () return getrolefilter("tank") end,
-                set = function (v) setrolefilter("tank", v) end,
+                get = function () return GetRoleFilter("TANK") end,
+                set = function (_, v) SetRoleFilter("TANK", v) end,
             },
         },
     },
@@ -138,21 +154,8 @@ local roleOptions = {
         name = L["Hide in combat"],
         desc = L["Hide roles while in combat."],
         order = 91,
-        get = function() return GridStatusDungeonRole.db.profile.dungeonRole.hideInCombat end,
-        set = function()
-            local settings = GridStatusDungeonRole.db.profile.dungeonRole
-            settings.hideInCombat = not settings.hideInCombat
-            if settings.enable then
-                if settings.hideInCombat then
-                    GridStatusDungeonRole:RegisterEvent("Grid_EnteringCombat")
-                    GridStatusDungeonRole:RegisterEvent("Grid_LeavingCombat")
-                else
-                    GridStatusDungeonRole:UnregisterEvent("Grid_EnteringCombat")
-                    GridStatusDungeonRole:UnregisterEvent("Grid_LeavingCombat")
-                end
-                GridStatusDungeonRole:RoleCheckAll()
-            end
-        end,
+        get = function() return GetHideInCombat() end,
+        set = function(_, v) SetHideInCombat(v) end,
     },
 
     ["color"] = false,
@@ -169,8 +172,8 @@ end
 function GridStatusDungeonRole:OnStatusEnable(status)
     if status == "dungeonRole" then
         if self.db.profile.dungeonRole.hideInCombat then
-            self:RegisterEvent("Grid_EnteringCombat")
-            self:RegisterEvent("Grid_LeavingCombat")
+            self:RegisterMessage("Grid_EnteringCombat")
+            self:RegisterMessage("Grid_LeavingCombat")
         end
         self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "RoleCheckAll")
         self:RegisterEvent("PARTY_MEMBERS_CHANGED", "RoleCheckAll")
@@ -181,8 +184,8 @@ end
 function GridStatusDungeonRole:OnStatusDisable(status)
     if status == "dungeonRole" then
         if self.db.profile.dungeonRole.hideInCombat then
-            self:UnregisterEvent("Grid_EnteringCombat")
-            self:UnregisterEvent("Grid_LeavingCombat")
+            self:UnregisterMessage("Grid_EnteringCombat")
+            self:UnregisterMessage("Grid_LeavingCombat")
         end
         self:UnregisterEvent("PLAYER_ROLES_ASSIGNED")
         self:UnregisterEvent("PARTY_MEMBERS_CHANGED")
@@ -194,11 +197,11 @@ function GridStatusDungeonRole:Reset()
     self.super.Reset(self)
     self:RoleCheckAll()
     if self.db.profile.dungeonRole.hideInCombat then
-        GridStatusDungeonRole:RegisterEvent("Grid_EnteringCombat")
-        GridStatusDungeonRole:RegisterEvent("Grid_LeavingCombat")
+        GridStatusDungeonRole:RegisterMessage("Grid_EnteringCombat")
+        GridStatusDungeonRole:RegisterMessage("Grid_LeavingCombat")
     else
-        GridStatusDungeonRole:UnregisterEvent("Grid_EnteringCombat")
-        GridStatusDungeonRole:UnregisterEvent("Grid_LeavingCombat")
+        GridStatusDungeonRole:UnregisterMessage("Grid_EnteringCombat")
+        GridStatusDungeonRole:UnregisterMessage("Grid_LeavingCombat")
     end
 end
 
@@ -234,17 +237,13 @@ function GridStatusDungeonRole:RoleCheck(guid)
     local gained
     local settings = self.db.profile.dungeonRole
     if settings.enable and ( not settings.hideInCombat or not Grid.inCombat ) then
-        local isTank, isHeal, isDPS = UnitGroupRolesAssigned(GridRoster:GetUnitidByGUID(guid))
-        if isTank then
-            role = "tank"
-        elseif isHeal then
-            role = "healer"
-        elseif isDPS then
-            role = "DPS"
-        else
+        local role = UnitGroupRolesAssigned(GridRoster:GetUnitidByGUID(guid))
+
+        if role == "NONE" then
             role = false
             gained = false
         end
+
         if role and settings.filter[role] then
             local status = rolestatus[role]
             self.core:SendStatusGained(
