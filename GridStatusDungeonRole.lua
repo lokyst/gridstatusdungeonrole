@@ -175,6 +175,7 @@ function GridStatusDungeonRole:OnStatusEnable(status)
             self:RegisterMessage("Grid_EnteringCombat")
             self:RegisterMessage("Grid_LeavingCombat")
         end
+        self:RegisterMessage("Grid_RosterUpdated", "RoleCheckAll")
         self:RegisterEvent("PLAYER_ROLES_ASSIGNED", "RoleCheckAll")
         self:RegisterEvent("PARTY_MEMBERS_CHANGED", "RoleCheckAll")
         self:RoleCheckAll()
@@ -187,6 +188,7 @@ function GridStatusDungeonRole:OnStatusDisable(status)
             self:UnregisterMessage("Grid_EnteringCombat")
             self:UnregisterMessage("Grid_LeavingCombat")
         end
+        self:UnregisterMessage("Grid_RosterUpdated")
         self:UnregisterEvent("PLAYER_ROLES_ASSIGNED")
         self:UnregisterEvent("PARTY_MEMBERS_CHANGED")
         self.core:SendStatusLostAllUnits("dungeonRole")
@@ -236,8 +238,10 @@ end
 function GridStatusDungeonRole:RoleCheck(guid)
     local gained
     local settings = self.db.profile.dungeonRole
+
     if settings.enable and ( not settings.hideInCombat or not Grid.inCombat ) then
-        local role = UnitGroupRolesAssigned(GridRoster:GetUnitidByGUID(guid))
+        local unitId = GridRoster:GetUnitidByGUID(guid)
+        local role = UnitGroupRolesAssigned(unitId)
 
         if role == "NONE" then
             role = false
@@ -260,6 +264,7 @@ function GridStatusDungeonRole:RoleCheck(guid)
             gained = true
         end
     end
+
     if not gained then
         self.core:SendStatusLost(guid, "dungeonRole")
     end
